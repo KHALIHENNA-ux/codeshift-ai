@@ -46,16 +46,20 @@ export default function MigrationPage() {
   const liveRef = useRef<HTMLPreElement>(null)
 
   useEffect(() => {
+    // Run exactly once. We deliberately do NOT abort the request on cleanup:
+    // React 18 Strict Mode (dev) mounts → unmounts → remounts, so aborting in
+    // the first cleanup would kill the in-flight request while the `started`
+    // guard blocks the remount from issuing a new one — leaving the UI stuck
+    // at 0%. The migrate route persists progress server-side and survives a
+    // dropped connection, so one un-aborted request is the correct model.
     if (started.current) return
     started.current = true
 
-    const controller = new AbortController()
     ;(async () => {
       const res = await fetch(`/api/projects/${id}/migrate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pathId, designStyle: design }),
-        signal: controller.signal,
       })
       if (!res.ok || !res.body) {
         setError(await res.text().catch(() => "Migration failed to start."))
@@ -85,10 +89,8 @@ export default function MigrationPage() {
         }
       }
     })().catch((e) => {
-      if (e.name !== "AbortError") setError(e.message)
+      setError(e.message)
     })
-
-    return () => controller.abort()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
