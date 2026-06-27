@@ -17,8 +17,21 @@ import {
   Sparkles,
   CircleDot,
   AlertCircle,
+  ShieldCheck,
+  ShieldAlert,
+  Wrench,
+  Link2,
+  Network,
+  Layers,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+
+// Color a 0-100 confidence score for the UI.
+function confColor(c: number): string {
+  if (c >= 80) return "text-emerald-400"
+  if (c >= 55) return "text-amber-400"
+  return "text-red-400"
+}
 
 const PHASES = ["planning", "rewriting", "documenting"]
 const PHASE_LABEL: Record<string, string> = {
@@ -40,6 +53,14 @@ export default function MigrationPage() {
   const [files, setFiles] = useState<RewrittenFile[]>([])
   const [currentPath, setCurrentPath] = useState<string | null>(null)
   const [liveBuffer, setLiveBuffer] = useState("")
+  const [activity, setActivity] = useState("")
+  const [order, setOrder] = useState<string[]>([])
+  const [coherence, setCoherence] = useState<{
+    importsReconciled: number
+    symbolsInjected: number
+  } | null>(null)
+  const [scale, setScale] = useState<{ windows: number } | null>(null)
+  const [batch, setBatch] = useState<{ index: number; total: number } | null>(null)
   const [done, setDone] = useState(false)
   const [error, setError] = useState("")
   const started = useRef(false)
@@ -106,9 +127,26 @@ export default function MigrationPage() {
       case "plan":
         setPlan(event.plan)
         break
+      case "graph":
+        setOrder(event.order)
+        break
+      case "scale":
+        setScale({ windows: event.windows })
+        break
+      case "window":
+        setBatch({ index: event.index, total: event.total })
+        setActivity(`Batch ${event.index + 1} of ${event.total} — ${event.files} files loaded into context`)
+        break
+      case "coherence":
+        setCoherence({
+          importsReconciled: event.importsReconciled,
+          symbolsInjected: event.symbolsInjected,
+        })
+        break
       case "file_start":
         setCurrentPath(event.path)
         setLiveBuffer("")
+        setActivity("")
         break
       case "file_token":
         setLiveBuffer((b) => b + event.text)
@@ -116,10 +154,31 @@ export default function MigrationPage() {
           liveRef.current?.scrollTo({ top: liveRef.current.scrollHeight })
         })
         break
+      case "verify_start":
+        setActivity(
+          event.round === 0
+            ? "Verifying — behavior parity, imports, completeness…"
+            : `Re-verifying after repair (round ${event.round})…`,
+        )
+        break
+      case "verify_result": {
+        const r = event.result
+        setActivity(
+          r.verified
+            ? `Verified · ${r.confidence}% confidence`
+            : `${r.diagnostics.length} issue(s) found · ${r.confidence}% confidence`,
+        )
+        break
+      }
+      case "repair_start":
+        setActivity(`Repairing ${event.issues} issue(s) — round ${event.round}…`)
+        setLiveBuffer("") // the repair regenerates the file; show it fresh
+        break
       case "file_done":
         setFiles((f) => [...f, event.file])
         setCurrentPath(null)
         setLiveBuffer("")
+        setActivity("")
         break
       case "done":
         setDone(true)
@@ -171,6 +230,18 @@ export default function MigrationPage() {
             <span className="font-mono text-muted-foreground">{progress}%</span>
           </div>
           <Progress value={progress} />
+          {activity && (
+            <div className="flex items-center gap-2 text-xs text-accent">
+              {activity.startsWith("Repairing") ? (
+                <Wrench className="h-3.5 w-3.5 animate-pulse" />
+              ) : activity.startsWith("Verified") ? (
+                <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+              ) : (
+                <ShieldAlert className="h-3.5 w-3.5" />
+              )}
+              <span>{activity}</span>
+            </div>
+          )}
           <div className="flex gap-2">
             {PHASES.map((p, i) => (
               <div
@@ -206,6 +277,85 @@ export default function MigrationPage() {
         </Card>
       )}
 
+      {done && files.length > 0 && (() => {
+        const withV = files.filter((f) => f.verification)
+        const verifiedCount = withV.filter((f) => f.verification!.verified).length
+        const avg = withV.length
+          ? Math.round(withV.reduce((s, f) => s + f.verification!.confidence, 0) / withV.length)
+          : 0
+        const repaired = withV.filter((f) => (f.verification!.rounds ?? 0) > 0).length
+        const openIssues = withV.reduce(
+          (s, f) => s + f.verification!.diagnostics.filter((d) => d.severity === "error").length,
+          0,
+        )
+        return (
+          <Card className="border-emerald-500/20">
+            <CardContent className="space-y-4 py-5">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <div>
+                <div className="flex items-center gap-1.5 text-2xl font-bold">
+                  <ShieldCheck className="h-5 w-5 text-emerald-400" />
+                  {verifiedCount}/{withV.length}
+                </div>
+                <p className="text-xs text-muted-foreground">passed verification</p>
+              </div>
+              <div>
+                <div className={cn("text-2xl font-bold", confColor(avg))}>{avg}%</div>
+                <p className="text-xs text-muted-foreground">avg. confidence</p>
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5 text-2xl font-bold">
+                  <Wrench className="h-4 w-4 text-accent" />
+                  {repaired}
+                </div>
+                <p className="text-xs text-muted-foreground">auto-repaired</p>
+              </div>
+              <div>
+                <div
+                  className={cn(
+                    "text-2xl font-bold",
+                    openIssues === 0 ? "text-emerald-400" : "text-amber-400",
+                  )}
+                >
+                  {openIssues}
+                </div>
+                <p className="text-xs text-muted-foreground">unresolved errors</p>
+              </div>
+            </div>
+            {coherence && (
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-border pt-3 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <Network className="h-3.5 w-3.5 text-accent" /> Cross-file coherence
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Link2 className="h-3.5 w-3.5 text-emerald-400" />
+                  <strong className="text-foreground">{coherence.importsReconciled}</strong> imports
+                  auto-reconciled
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <FileCode2 className="h-3.5 w-3.5 text-primary" />
+                  <strong className="text-foreground">{coherence.symbolsInjected}</strong> migrated
+                  symbols fed into context
+                </span>
+              </div>
+            )}
+            {scale && scale.windows > 1 && (
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-border pt-3 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <Layers className="h-3.5 w-3.5 text-amber-400" /> Large-codebase mode
+                </span>
+                <span>
+                  migrating in <strong className="text-foreground">{scale.windows}</strong> context
+                  batches
+                  {batch ? ` · on batch ${batch.index + 1} of ${batch.total}` : ""}
+                </span>
+              </div>
+            )}
+            </CardContent>
+          </Card>
+        )
+      })()}
+
       <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
         {/* left: plan + file list */}
         <div className="space-y-6">
@@ -231,20 +381,60 @@ export default function MigrationPage() {
               <CardTitle className="flex items-center gap-2 text-base">
                 <FileCode2 className="h-4 w-4 text-primary" />
                 Rewritten files
-                <Badge variant="secondary">{files.length}</Badge>
+                <Badge variant="secondary">
+                  {files.length}
+                  {order.length ? `/${order.length}` : ""}
+                </Badge>
               </CardTitle>
+              {order.length > 0 && (
+                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Network className="h-3 w-3 text-accent" />
+                  Dependency order — leaves first
+                </p>
+              )}
             </CardHeader>
             <CardContent className="max-h-[400px] space-y-1.5 overflow-y-auto">
               {files.length === 0 && !currentPath && (
                 <p className="text-sm text-muted-foreground">Waiting for the first file…</p>
               )}
-              {files.map((f) => (
-                <div key={f.path} className="flex items-center gap-2 text-sm">
-                  <Check className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
-                  <span className="truncate font-mono text-xs">{f.path}</span>
-                  {f.isNew && <Badge variant="accent" className="ml-auto shrink-0">new</Badge>}
-                </div>
-              ))}
+              {files.map((f) => {
+                const v = f.verification
+                return (
+                  <div key={f.path} className="flex items-center gap-2 text-sm">
+                    {v?.verified ? (
+                      <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
+                    ) : v ? (
+                      <ShieldAlert className="h-3.5 w-3.5 shrink-0 text-amber-400" />
+                    ) : (
+                      <Check className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
+                    )}
+                    <span className="truncate font-mono text-xs">{f.path}</span>
+                    <span className="ml-auto flex shrink-0 items-center gap-1.5">
+                      {f.coherence && f.coherence.importsReconciled > 0 && (
+                        <span
+                          className="flex items-center gap-0.5 text-[10px] text-accent"
+                          title={`${f.coherence.importsReconciled} import(s) auto-reconciled to migrated paths`}
+                        >
+                          <Link2 className="h-3 w-3" />
+                          {f.coherence.importsReconciled}
+                        </span>
+                      )}
+                      {v && v.rounds > 0 && (
+                        <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                          <Wrench className="h-3 w-3" />
+                          {v.rounds}
+                        </span>
+                      )}
+                      {v && (
+                        <span className={cn("font-mono text-[10px]", confColor(v.confidence))}>
+                          {v.confidence}%
+                        </span>
+                      )}
+                      {f.isNew && <Badge variant="accent">new</Badge>}
+                    </span>
+                  </div>
+                )
+              })}
               {currentPath && (
                 <div className="flex items-center gap-2 text-sm">
                   <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-primary" />

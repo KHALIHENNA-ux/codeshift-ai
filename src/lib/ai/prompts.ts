@@ -42,6 +42,93 @@ You are rewriting source files for a ${path.label} migration into ${path.toStack
 For each file you are asked to rewrite, output ONLY the complete, final contents of the modernized file — no markdown fences, no prose, no preamble. The file must be complete and runnable, not a sketch. Use the conventions, file layout, and idioms of ${path.toStack}.`
 }
 
+// ─────────────────────────── Verification ───────────────────────────
+
+// A strict, adversarial reviewer persona. Deliberately separate from the
+// rewriter so it does not rationalize the rewriter's own choices — it audits
+// the output against the legacy source the way a skeptical senior reviewer would.
+export function verifierSystem(path: MigrationPathDef): string {
+  return `${ENGINEER_SYSTEM}
+
+PHASE: Verification (adversarial review).
+You are reviewing a single file that was just rewritten for a ${path.label} migration into ${path.toStack}. The complete legacy codebase is provided above as context.
+
+Your ONLY job is to find real defects. Be skeptical and precise. Check, in priority order:
+1. BEHAVIOR PARITY — does the rewrite do exactly what the legacy file did? Flag any dropped branch, changed default, off-by-one, altered control flow, missing side effect, or silently changed output. This is the most important check.
+2. IMPORTS / WIRING — do imports, module paths, and referenced symbols actually exist in the target stack and across the (migrating) codebase? Flag broken or hallucinated imports.
+3. COMPLETENESS — is the file complete and runnable, with NO placeholders, stubs, TODOs, or "rest of code unchanged" elisions standing in for real logic?
+4. TYPES — for typed targets, is the typing sound (no unjustified \`any\`, no impossible types)?
+5. SECURITY — was any vulnerability introduced, or a legacy one left unfixed without being flagged?
+6. IDIOM — only flag deviations from ${path.toStack} conventions that a reviewer would actually block on.
+
+Rules:
+- Report a defect ONLY when you are confident it is real. Do not invent issues to seem thorough — a clean file with an empty diagnostics list is the correct answer when the rewrite is correct.
+- "error" = would break the build or change behavior; "warning" = a real problem a reviewer would want fixed but not a blocker; "info" = minor note.
+- behaviorParity is 0-100: 100 = behavior provably identical, 0 = behavior clearly wrong.
+- Cite a line number when you can.`
+}
+
+// Instruction handed back to the rewriter to fix a file in place, given the
+// reviewer's diagnostics. The rewriter still sees the cached codebase context.
+export function repairInstruction(
+  path: MigrationPathDef,
+  newPath: string,
+  current: string,
+  diagnostics: { severity: string; category: string; message: string; suggestion?: string; line?: number }[],
+): string {
+  const issues = diagnostics
+    .map(
+      (d, i) =>
+        `${i + 1}. [${d.severity.toUpperCase()}/${d.category}]${d.line ? ` line ${d.line}:` : ""} ${d.message}${
+          d.suggestion ? `\n   → suggested fix: ${d.suggestion}` : ""
+        }`,
+    )
+    .join("\n")
+
+  return `The file "${newPath}" you produced for this ${path.label} migration into ${path.toStack} failed verification. A reviewer found these defects:
+
+${issues}
+
+Fix every issue above without introducing new ones. Preserve the legacy file's behavior exactly. Use the full codebase context above to keep imports and shared APIs consistent with the rest of the migrated project.
+
+Output ONLY the complete, corrected file contents — no markdown fences, no prose, no preamble. Begin with a single line comment of the form: NEWPATH: ${newPath}
+
+Current contents to fix:
+${current}`
+}
+
+// Structured shape returned by the AI reviewer.
+export const VERIFY_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    behaviorParity: {
+      type: "integer",
+      description: "0-100: how faithfully the rewrite preserves the legacy file's observable behavior.",
+    },
+    diagnostics: {
+      type: "array",
+      description: "Real defects found. Empty when the rewrite is correct.",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          severity: { type: "string", enum: ["error", "warning", "info"] },
+          category: {
+            type: "string",
+            enum: ["behavior", "imports", "types", "security", "idiom"],
+          },
+          message: { type: "string" },
+          suggestion: { type: "string" },
+          line: { type: "integer" },
+        },
+        required: ["severity", "category", "message", "suggestion", "line"],
+      },
+    },
+  },
+  required: ["behaviorParity", "diagnostics"],
+} as const
+
 // The shape we ask the analyzer to return. Used with structured outputs.
 export const ANALYSIS_SCHEMA = {
   type: "object",

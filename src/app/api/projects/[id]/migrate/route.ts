@@ -79,6 +79,11 @@ export async function POST(req: Request, { params }: { params: { id: string } })
                 explanation: f.explanation,
                 isNew: f.isNew,
                 testContent: f.test,
+                verified: f.verification?.verified ?? false,
+                confidence: f.verification?.confidence ?? 0,
+                behaviorParity: f.verification?.behaviorParity ?? 0,
+                repairRounds: f.verification?.rounds ?? 0,
+                diagnostics: (f.verification?.diagnostics ?? []) as object,
               },
             })
           } else if (event.type === "progress") {

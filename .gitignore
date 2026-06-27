@@ -44,3 +44,9 @@ next-env.d.ts
 /uploads
 /tmp
 *.zip
+
+# proof harness output (clones, migrated trees, diffs, reports)
+proof/
+
+# local dev server logs
+dev-server*.log

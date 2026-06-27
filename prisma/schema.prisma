@@ -180,6 +180,13 @@ model MigratedFile {
   isNew         Boolean @default(false) // file with no legacy counterpart
   testContent   String? @db.Text // generated test for this file
 
+  // Closed-loop verification results
+  verified      Boolean @default(false) // passed verification (no errors, high confidence)
+  confidence    Int     @default(0)     // 0-100 combined confidence score
+  behaviorParity Int    @default(0)     // 0-100 behavior-preservation score
+  repairRounds  Int     @default(0)     // self-repair passes taken
+  diagnostics   Json?                   // [{ severity, category, message, suggestion, line }]
+
   migration  Migration   @relation(fields: [migrationId], references: [id], onDelete: Cascade)
   sourceFile SourceFile? @relation(fields: [sourceFileId], references: [id], onDelete: SetNull)
 
