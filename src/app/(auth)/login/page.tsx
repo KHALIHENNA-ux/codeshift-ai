@@ -5,8 +5,9 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
-import { Github, Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { AuthShell, Field } from "@/components/auth/auth-shell"
+import { GitHubLogo } from "@/components/icons/github-logo"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -50,7 +51,7 @@ export default function LoginPage() {
         className="w-full"
         onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
       >
-        <Github className="h-4 w-4" />
+        <GitHubLogo className="h-4 w-4" />
         Sign in with GitHub
       </Button>
       <p className="mt-6 text-center text-sm text-muted-foreground">
