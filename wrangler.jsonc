@@ -8,13 +8,11 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
-  // The migration route streams for minutes across many model calls. Workers
-  // bill CPU time, not wall-clock spent awaiting fetch, but the engine's own
-  // parsing/diffing across a large codebase is real CPU. 30s (the default) is
-  // not enough; 300000 is the paid-plan ceiling.
-  "limits": {
-    "cpu_ms": 300000
-  },
+  // NOTE: the account is on the Workers Free plan, which rejects `limits`
+  // (API error 100328) and caps CPU at 10ms per invocation. The migration
+  // route needs far more than that — it streams for minutes and does real
+  // parsing/diffing work. On Workers Paid, restore:
+  //   "limits": { "cpu_ms": 300000 }
   "observability": {
     "enabled": true
   }
