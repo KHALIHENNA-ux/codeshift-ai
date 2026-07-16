@@ -26,7 +26,7 @@ const IGNORE = [
 const MAX_FILE_BYTES = 400_000 // skip enormous generated files
 const MAX_FILES = 400 // safety cap on codebase size
 
-function shouldIgnore(path: string): boolean {
+export function shouldIgnore(path: string): boolean {
   return IGNORE.some((re) => re.test(path))
 }
 
@@ -61,14 +61,14 @@ export async function parseZip(buffer: ArrayBuffer): Promise<ParsedFile[]> {
   return files.sort((a, b) => a.path.localeCompare(b.path))
 }
 
-function commonRoot(paths: string[]): string {
+export function commonRoot(paths: string[]): string {
   if (paths.length === 0) return ""
   const firstSeg = paths[0].split("/")[0] + "/"
   return paths.every((p) => p.startsWith(firstSeg)) ? firstSeg : ""
 }
 
 // Cheap heuristic: a high ratio of null bytes / control chars => binary.
-function looksBinary(s: string): boolean {
+export function looksBinary(s: string): boolean {
   const sample = s.slice(0, 1000)
   let suspicious = 0
   for (let i = 0; i < sample.length; i++) {
