@@ -6,7 +6,7 @@ export const MIGRATION_PATHS: MigrationPathDef[] = [
     id: "PHP_TO_LARAVEL",
     from: "Legacy PHP",
     to: "Laravel 11",
-    label: "PHP → Laravel",
+    label: "PHP to Laravel",
     description:
       "Procedural PHP, raw mysqli queries, and mixed HTML/logic become a clean Laravel app with Eloquent models, controllers, migrations, and Blade/Inertia views.",
     fromLang: "php",
@@ -18,7 +18,7 @@ export const MIGRATION_PATHS: MigrationPathDef[] = [
     id: "JQUERY_TO_REACT",
     from: "jQuery",
     to: "React",
-    label: "jQuery → React",
+    label: "jQuery to React",
     description:
       "Imperative DOM manipulation and spaghetti event handlers become declarative, component-based React with hooks, typed props, and modern state management.",
     fromLang: "javascript",
@@ -30,7 +30,7 @@ export const MIGRATION_PATHS: MigrationPathDef[] = [
     id: "WORDPRESS_TO_NEXTJS",
     from: "WordPress",
     to: "Next.js",
-    label: "WordPress → Next.js",
+    label: "WordPress to Next.js",
     description:
       "PHP themes and the WP template hierarchy become a headless Next.js App Router site — server components, ISR, and a typed content layer.",
     fromLang: "php",
@@ -42,7 +42,7 @@ export const MIGRATION_PATHS: MigrationPathDef[] = [
     id: "PYTHON2_TO_PYTHON3",
     from: "Python 2",
     to: "Python 3",
-    label: "Python 2 → Python 3",
+    label: "Python 2 to Python 3",
     description:
       "print statements, old-style classes, and 2.x stdlib calls are modernized to idiomatic Python 3.12 with type hints, f-strings, and pathlib.",
     fromLang: "python",
@@ -54,7 +54,7 @@ export const MIGRATION_PATHS: MigrationPathDef[] = [
     id: "ANGULARJS_TO_REACT",
     from: "AngularJS",
     to: "React",
-    label: "AngularJS → React",
+    label: "AngularJS to React",
     description:
       "AngularJS 1.x controllers, $scope, and directives become React function components, hooks, and a predictable unidirectional data flow.",
     fromLang: "javascript",
@@ -66,7 +66,7 @@ export const MIGRATION_PATHS: MigrationPathDef[] = [
     id: "VANILLA_TO_VUE",
     from: "Vanilla JS",
     to: "Vue 3",
-    label: "Vanilla JS → Vue 3",
+    label: "Vanilla JS to Vue 3",
     description:
       "Hand-rolled DOM scripts become a Vue 3 single-file-component app with the Composition API, reactive state, and Vite tooling.",
     fromLang: "javascript",

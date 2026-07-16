@@ -9,7 +9,6 @@ import {
   ShieldCheck,
   FileText,
   Rocket,
-  ArrowRight,
   Check,
 } from "lucide-react"
 import { Card } from "@/components/ui/card"
@@ -76,7 +75,6 @@ export function Paths() {
           <Card key={p.id} className="card-hover group p-6">
             <div className="mb-4 flex items-center gap-3">
               <Badge variant="outline" className="font-mono">{p.from}</Badge>
-              <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
               <Badge style={{ backgroundColor: `${p.accent}22`, color: p.accent }} className="font-mono">
                 {p.to}
               </Badge>
@@ -194,7 +192,6 @@ export function FinalCTA() {
         <Button asChild variant="gradient" size="lg" className="mt-8">
           <Link href="/register">
             Start your free migration
-            <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
       </Card>

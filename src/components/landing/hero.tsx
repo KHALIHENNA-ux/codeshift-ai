@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowRight, Sparkles } from "lucide-react"
+import { Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function Hero() {
@@ -15,7 +15,6 @@ export function Hero() {
         >
           <Sparkles className="h-3.5 w-3.5 text-accent" />
           Powered by Claude Opus — the most capable code model
-          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
         </Link>
 
         <h1 className="max-w-4xl text-balance text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
@@ -34,7 +33,6 @@ export function Hero() {
           <Button asChild variant="gradient" size="lg">
             <Link href="/register">
               Modernize a project free
-              <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg">
@@ -59,12 +57,12 @@ export function Hero() {
             </p>
             <p className="mt-2 text-emerald-400">✓ Detected: PHP 5.6 + jQuery 1.9 · 84 files</p>
             <p className="text-amber-400">⚠ 11 outdated deps · 3 SQL-injection risks flagged</p>
-            <p className="text-foreground">→ Recommended path: PHP → Laravel 11 + React</p>
+            <p className="text-foreground">Recommended path: PHP to Laravel 11 + React</p>
             <p className="mt-2 text-muted-foreground">
               <span className="text-accent">codeshift</span> migrate --design modern-saas
             </p>
             <p className="mt-2 text-primary">
-              ⠿ Rewriting controllers/CheckoutController.php → app/Http/Controllers…
+              ⠿ Rewriting controllers/CheckoutController.php as app/Http/Controllers…
               <span className="ml-1 inline-block h-4 w-2 animate-pulse bg-primary align-middle" />
             </p>
           </div>

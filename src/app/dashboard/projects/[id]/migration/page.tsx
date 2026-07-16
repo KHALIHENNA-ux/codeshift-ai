@@ -199,7 +199,7 @@ export default function MigrationPage() {
             href={`/dashboard/projects/${id}`}
             className="text-sm text-muted-foreground hover:text-foreground"
           >
-            ← Back to project
+            Back to project
           </Link>
           <h1 className="mt-2 flex items-center gap-2 text-2xl font-bold tracking-tight">
             <Sparkles className="h-5 w-5 text-accent" />

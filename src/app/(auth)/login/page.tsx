@@ -7,7 +7,7 @@ import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
 import { AuthShell, Field } from "@/components/auth/auth-shell"
-import { GitHubLogo } from "@/components/icons/github-logo"
+import { GitHubSignInButton, AuthDivider } from "@/components/auth/github-button"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -40,20 +40,8 @@ export default function LoginPage() {
           Sign in
         </Button>
       </form>
-      <div className="my-6 flex items-center gap-3">
-        <div className="h-px flex-1 bg-border" />
-        <span className="text-xs uppercase tracking-wider text-muted-foreground">or</span>
-        <div className="h-px flex-1 bg-border" />
-      </div>
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full"
-        onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
-      >
-        <GitHubLogo className="h-4 w-4" />
-        Sign in with GitHub
-      </Button>
+      <AuthDivider />
+      <GitHubSignInButton />
       <p className="mt-6 text-center text-sm text-muted-foreground">
         New here?{" "}
         <Link href="/register" className="text-primary hover:underline">

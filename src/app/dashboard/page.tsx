@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { formatBytes, relativeTime } from "@/lib/utils"
-import { FileCode2, Plus, ArrowRight, Boxes } from "lucide-react"
+import { FileCode2, Plus, Boxes } from "lucide-react"
 
 const STATUS_VARIANT: Record<string, "secondary" | "default" | "accent" | "success" | "warning" | "danger"> = {
   UPLOADED: "secondary",
@@ -73,11 +73,10 @@ export default async function DashboardPage() {
                     {p.fileCount} files · {formatBytes(p.totalBytes)}
                   </p>
                   {p.targetStack && (
-                    <p className="mt-3 truncate font-mono text-xs text-accent">→ {p.targetStack}</p>
+                    <p className="mt-3 truncate font-mono text-xs text-accent">{p.targetStack}</p>
                   )}
                   <div className="mt-5 flex items-center justify-between text-xs text-muted-foreground">
                     <span>{relativeTime(p.updatedAt)}</span>
-                    <ArrowRight className="h-4 w-4" />
                   </div>
                 </Card>
               </Link>

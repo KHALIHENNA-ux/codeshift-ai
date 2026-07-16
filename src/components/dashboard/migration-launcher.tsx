@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { MIGRATION_PATHS, DESIGN_STYLES } from "@/lib/migration-paths"
-import { Wand2, ArrowRight } from "lucide-react"
+import { Wand2 } from "lucide-react"
 
 export function MigrationLauncher({
   projectId,
@@ -98,7 +98,7 @@ export function MigrationLauncher({
           )}
         </div>
         <Button variant="gradient" onClick={start}>
-          Start migration <ArrowRight className="h-4 w-4" />
+          Start migration
         </Button>
       </div>
     </Card>

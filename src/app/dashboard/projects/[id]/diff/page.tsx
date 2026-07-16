@@ -37,7 +37,7 @@ export default async function DiffPage({ params }: { params: { id: string } }) {
             href={`/dashboard/projects/${project.id}`}
             className="text-sm text-muted-foreground hover:text-foreground"
           >
-            ← Back to project
+            Back to project
           </Link>
           <h1 className="mt-2 text-2xl font-bold tracking-tight">
             {project.name} <span className="text-muted-foreground">— diff</span>

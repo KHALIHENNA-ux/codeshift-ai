@@ -107,7 +107,7 @@ export function AnalysisView({
                   <span className="ml-2 text-xs text-muted-foreground">{d.version}</span>
                   {d.replacement && d.replacement !== "none" && (
                     <span className="ml-2 inline-flex items-center gap-1 text-xs text-emerald-400">
-                      <PackageCheck className="h-3 w-3" /> → {d.replacement}
+                      <PackageCheck className="h-3 w-3" /> {d.replacement}
                     </span>
                   )}
                 </div>

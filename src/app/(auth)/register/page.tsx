@@ -7,6 +7,7 @@ import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
 import { AuthShell, Field } from "@/components/auth/auth-shell"
+import { GitHubSignInButton, AuthDivider } from "@/components/auth/github-button"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -55,6 +56,8 @@ export default function RegisterPage() {
           Create account
         </Button>
       </form>
+      <AuthDivider />
+      <GitHubSignInButton label="Sign up with GitHub" />
       <p className="mt-6 text-center text-sm text-muted-foreground">
         Already have an account?{" "}
         <Link href="/login" className="text-primary hover:underline">

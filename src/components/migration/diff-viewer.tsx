@@ -133,10 +133,7 @@ export function DiffViewer({
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2 font-mono text-sm">
                 {file.oldPath && file.oldPath !== file.path && (
-                  <>
-                    <span className="text-muted-foreground line-through">{file.oldPath}</span>
-                    <span>→</span>
-                  </>
+                  <span className="text-muted-foreground line-through">{file.oldPath}</span>
                 )}
                 <span className="text-foreground">{file.path}</span>
                 {file.isNew && <Badge variant="accent">new file</Badge>}

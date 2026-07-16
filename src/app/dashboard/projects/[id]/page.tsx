@@ -11,7 +11,7 @@ import { AnalyzeTrigger } from "@/components/dashboard/analyze-trigger"
 import { formatBytes } from "@/lib/utils"
 import { getPath } from "@/lib/migration-paths"
 import type { DependencyFinding, RiskFinding, DependencyGraph } from "@/types"
-import { FileCode2, Cpu, ShieldCheck, GitCompare, FileText, ArrowRight } from "lucide-react"
+import { FileCode2, Cpu, ShieldCheck, GitCompare, FileText, Target } from "lucide-react"
 
 export default async function ProjectPage({ params }: { params: { id: string } }) {
   const session = await auth()
@@ -34,7 +34,7 @@ export default async function ProjectPage({ params }: { params: { id: string } }
       {/* Header */}
       <div>
         <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">
-          ← All projects
+          All projects
         </Link>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -58,7 +58,7 @@ export default async function ProjectPage({ params }: { params: { id: string } }
           value={project.riskLevel ?? "—"}
           tone={project.riskLevel === "HIGH" ? "danger" : project.riskLevel === "MEDIUM" ? "warning" : "ok"}
         />
-        <Stat icon={ArrowRight} label="Target" value={recommended?.to ?? "—"} />
+        <Stat icon={Target} label="Target" value={recommended?.to ?? "—"} />
       </div>
 
       {/* Body by status */}
@@ -144,7 +144,7 @@ export default async function ProjectPage({ params }: { params: { id: string } }
                         href={`/dashboard/projects/${project.id}/migration`}
                         className="text-primary hover:underline"
                       >
-                        Watch it live →
+                        Watch it live
                       </Link>
                     </CardContent>
                   </Card>
