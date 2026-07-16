@@ -28,6 +28,13 @@ yarn-error.log*
 .env
 .env*.local
 .env.production
+.env.bak-*
+
+# cloudflare / opennext
+.open-next/
+.wrangler/
+.dev.vars
+.dev.vars.*
 
 # vercel
 .vercel
