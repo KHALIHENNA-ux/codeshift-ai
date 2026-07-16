@@ -41,7 +41,7 @@ export default function LoginPage() {
         </Button>
       </form>
       <AuthDivider />
-      <GitHubSignInButton />
+      <GitHubSignInButton className="w-full" />
       <p className="mt-6 text-center text-sm text-muted-foreground">
         New here?{" "}
         <Link href="/register" className="text-primary hover:underline">

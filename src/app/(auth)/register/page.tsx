@@ -57,7 +57,7 @@ export default function RegisterPage() {
         </Button>
       </form>
       <AuthDivider />
-      <GitHubSignInButton label="Sign up with GitHub" />
+      <GitHubSignInButton label="Sign up with GitHub" className="w-full" />
       <p className="mt-6 text-center text-sm text-muted-foreground">
         Already have an account?{" "}
         <Link href="/login" className="text-primary hover:underline">

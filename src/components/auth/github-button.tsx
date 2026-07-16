@@ -1,15 +1,29 @@
 "use client"
 
+import type { ComponentProps } from "react"
 import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { GitHubLogo } from "@/components/icons/github-logo"
 
-export function GitHubSignInButton({ label = "Sign in with GitHub" }: { label?: string }) {
+interface Props {
+  label?: string
+  className?: string
+  size?: ComponentProps<typeof Button>["size"]
+  variant?: ComponentProps<typeof Button>["variant"]
+}
+
+export function GitHubSignInButton({
+  label = "Sign in with GitHub",
+  className,
+  size,
+  variant = "outline",
+}: Props) {
   return (
     <Button
       type="button"
-      variant="outline"
-      className="w-full"
+      variant={variant}
+      size={size}
+      className={className}
       onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
     >
       <GitHubLogo className="h-4 w-4" />

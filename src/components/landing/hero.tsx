@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { GitHubSignInButton } from "@/components/auth/github-button"
 
 export function Hero() {
   return (
@@ -38,6 +39,7 @@ export function Hero() {
           <Button asChild variant="outline" size="lg">
             <a href="#how">See how it works</a>
           </Button>
+          <GitHubSignInButton size="lg" />
         </div>
 
         <p className="mt-4 text-sm text-muted-foreground">

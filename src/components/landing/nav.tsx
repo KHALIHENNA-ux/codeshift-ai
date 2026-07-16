@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Logo } from "@/components/logo"
 import { Button } from "@/components/ui/button"
+import { GitHubSignInButton } from "@/components/auth/github-button"
 
 export function LandingNav() {
   return (
@@ -19,6 +20,7 @@ export function LandingNav() {
           <Button asChild variant="ghost" size="sm">
             <Link href="/login">Sign in</Link>
           </Button>
+          <GitHubSignInButton size="sm" className="hidden sm:inline-flex" />
           <Button asChild variant="gradient" size="sm">
             <Link href="/register">Start free</Link>
           </Button>

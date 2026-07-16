@@ -14,6 +14,7 @@ import {
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { GitHubSignInButton } from "@/components/auth/github-button"
 import { MIGRATION_PATHS } from "@/lib/migration-paths"
 
 export function HowItWorks() {
@@ -145,6 +146,7 @@ export function Pricing() {
           <Button asChild variant="outline" className="mt-8 w-full">
             <Link href="/register">Start free</Link>
           </Button>
+          <GitHubSignInButton label="Sign up with GitHub" className="mt-3 w-full" />
         </Card>
 
         <Card className="border-gradient relative p-8">
@@ -170,6 +172,7 @@ export function Pricing() {
           <Button asChild variant="gradient" className="mt-8 w-full">
             <Link href="/register">Modernize a project</Link>
           </Button>
+          <GitHubSignInButton label="Sign up with GitHub" className="mt-3 w-full" />
         </Card>
       </div>
     </section>
@@ -189,11 +192,14 @@ export function FinalCTA() {
         <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
           Built for freelancers, agencies, and teams sitting on aging code. Stop dreading the rewrite.
         </p>
-        <Button asChild variant="gradient" size="lg" className="mt-8">
-          <Link href="/register">
-            Start your free migration
-          </Link>
-        </Button>
+        <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <Button asChild variant="gradient" size="lg">
+            <Link href="/register">
+              Start your free migration
+            </Link>
+          </Button>
+          <GitHubSignInButton size="lg" />
+        </div>
       </Card>
     </section>
   )
