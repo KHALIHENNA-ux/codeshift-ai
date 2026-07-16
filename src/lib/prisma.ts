@@ -29,14 +29,37 @@ function connectionString(): string {
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
 
+function makeClient(): PrismaClient {
+  const pool = new Pool({ connectionString: connectionString() })
+  return new PrismaClient({
+    adapter: new PrismaPg(pool),
+    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+  })
+}
+
+// One client per request on Workers. A TCP socket must not outlive the request
+// that opened it: workerd cancels ("script hung") any request that awaits I/O
+// owned by an earlier one, so a globally cached pool poisons every other
+// DB-touching request. The ExecutionContext is unique per request and keys the
+// cache; sockets die with their request, which the Supabase pooler is built for.
+const perRequest = new WeakMap<object, PrismaClient>()
+
 function client(): PrismaClient {
-  if (!globalForPrisma.prisma) {
-    const pool = new Pool({ connectionString: connectionString() })
-    globalForPrisma.prisma = new PrismaClient({
-      adapter: new PrismaPg(pool),
-      log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-    })
+  let ctx: object | undefined
+  try {
+    ctx = getCloudflareContext().ctx
+  } catch {
+    // Not in a Cloudflare request: `tsx` scripts, prisma seed, next build.
   }
+  if (ctx) {
+    let c = perRequest.get(ctx)
+    if (!c) {
+      c = makeClient()
+      perRequest.set(ctx, c)
+    }
+    return c
+  }
+  if (!globalForPrisma.prisma) globalForPrisma.prisma = makeClient()
   return globalForPrisma.prisma
 }
 
