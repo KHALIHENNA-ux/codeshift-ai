@@ -1,32 +1,44 @@
 import type { MetadataRoute } from "next";
-
-const BASE_URL = "https://codeshift.vip";
+import { MIGRATION_SEO, SITE } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const now = new Date();
   return [
     {
-      url: `${BASE_URL}/`,
-      lastModified: new Date(),
+      url: `${SITE.url}/`,
+      lastModified: now,
       changeFrequency: "weekly",
       priority: 1,
     },
     {
-      url: `${BASE_URL}/pricing`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
+      url: `${SITE.url}/migrations`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    ...Object.values(MIGRATION_SEO).map((seo) => ({
+      url: `${SITE.url}/migrations/${seo.slug}`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
       priority: 0.8,
+    })),
+    {
+      url: `${SITE.url}/pricing`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
     },
     {
-      url: `${BASE_URL}/login`,
-      lastModified: new Date(),
+      url: `${SITE.url}/login`,
+      lastModified: now,
       changeFrequency: "yearly",
-      priority: 0.3,
+      priority: 0.2,
     },
     {
-      url: `${BASE_URL}/register`,
-      lastModified: new Date(),
+      url: `${SITE.url}/register`,
+      lastModified: now,
       changeFrequency: "yearly",
-      priority: 0.5,
+      priority: 0.4,
     },
   ];
 }

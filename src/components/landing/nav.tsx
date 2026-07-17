@@ -11,10 +11,10 @@ export function LandingNav() {
           <Logo />
         </Link>
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
-          <a href="#how" className="transition-colors hover:text-foreground">How it works</a>
-          <a href="#paths" className="transition-colors hover:text-foreground">Migrations</a>
-          <a href="#features" className="transition-colors hover:text-foreground">Features</a>
-          <a href="#pricing" className="transition-colors hover:text-foreground">Pricing</a>
+          <a href="/#how" className="transition-colors hover:text-foreground">How it works</a>
+          <Link href="/migrations" className="transition-colors hover:text-foreground">Migrations</Link>
+          <a href="/#features" className="transition-colors hover:text-foreground">Features</a>
+          <Link href="/pricing" className="transition-colors hover:text-foreground">Pricing</Link>
         </nav>
         <div className="flex items-center gap-3">
           <Button asChild variant="ghost" size="sm">

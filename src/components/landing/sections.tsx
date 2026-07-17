@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { GitHubSignInButton } from "@/components/auth/github-button"
 import { MIGRATION_PATHS } from "@/lib/migration-paths"
+import { migrationSlug } from "@/lib/seo"
 
 export function HowItWorks() {
   const steps = [
@@ -73,16 +74,19 @@ export function Paths() {
       />
       <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {MIGRATION_PATHS.map((p) => (
-          <Card key={p.id} className="card-hover group p-6">
-            <div className="mb-4 flex items-center gap-3">
-              <Badge variant="outline" className="font-mono">{p.from}</Badge>
-              <Badge style={{ backgroundColor: `${p.accent}22`, color: p.accent }} className="font-mono">
-                {p.to}
-              </Badge>
-            </div>
-            <p className="text-sm leading-relaxed text-muted-foreground">{p.description}</p>
-            <p className="mt-4 font-mono text-xs text-foreground/80">{p.toStack}</p>
-          </Card>
+          <Link key={p.id} href={`/migrations/${migrationSlug(p.id)}`} className="group">
+            <Card className="card-hover h-full p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <Badge variant="outline" className="font-mono">{p.from}</Badge>
+                <Badge style={{ backgroundColor: `${p.accent}22`, color: p.accent }} className="font-mono">
+                  {p.to}
+                </Badge>
+              </div>
+              <h3 className="mb-2 font-semibold">{p.label}</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">{p.description}</p>
+              <p className="mt-4 font-mono text-xs text-foreground/80">{p.toStack}</p>
+            </Card>
+          </Link>
         ))}
       </div>
     </section>
@@ -207,10 +211,45 @@ export function FinalCTA() {
 
 export function Footer() {
   return (
-    <footer className="border-t border-border/50 py-10">
-      <div className="container flex flex-col items-center justify-between gap-4 text-sm text-muted-foreground md:flex-row">
-        <p>© {new Date().getFullYear()} CodeShift. The AI Code Modernization Engine.</p>
-        <p className="font-mono text-xs">Runs on Claude Opus 4.8</p>
+    <footer className="border-t border-border/50 py-12">
+      <div className="container">
+        <div className="grid gap-10 md:grid-cols-3">
+          <div>
+            <p className="font-semibold">CodeShift</p>
+            <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">
+              The AI code modernization engine. Legacy codebases analyzed, rewritten, verified and
+              tested — in hours, not months.
+            </p>
+          </div>
+          <div>
+            <p className="text-sm font-semibold">Migrations</p>
+            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+              {MIGRATION_PATHS.map((p) => (
+                <li key={p.id}>
+                  <Link
+                    href={`/migrations/${migrationSlug(p.id)}`}
+                    className="transition-colors hover:text-foreground"
+                  >
+                    {p.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-sm font-semibold">Product</p>
+            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+              <li><Link href="/migrations" className="transition-colors hover:text-foreground">All migration paths</Link></li>
+              <li><Link href="/pricing" className="transition-colors hover:text-foreground">Pricing</Link></li>
+              <li><Link href="/register" className="transition-colors hover:text-foreground">Start free</Link></li>
+              <li><Link href="/login" className="transition-colors hover:text-foreground">Sign in</Link></li>
+            </ul>
+          </div>
+        </div>
+        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border/50 pt-6 text-sm text-muted-foreground md:flex-row">
+          <p>© {new Date().getFullYear()} CodeShift. The AI Code Modernization Engine.</p>
+          <p className="font-mono text-xs">Runs on Claude Opus 4.8</p>
+        </div>
       </div>
     </footer>
   )
