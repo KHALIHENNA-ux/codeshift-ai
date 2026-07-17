@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { getBalance, CREDIT_PACKS, BYTES_PER_CREDIT, type CreditPackKey } from "@/lib/credits"
+import { runtimeEnv } from "@/lib/env"
 import { DashboardHeader } from "@/components/dashboard/header"
 import { BuyButton } from "@/components/credits/buy-button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -81,7 +82,7 @@ export default async function CreditsPage({
         <div className="grid gap-5 md:grid-cols-3">
           {(Object.entries(CREDIT_PACKS) as [CreditPackKey, (typeof CREDIT_PACKS)[CreditPackKey]][]).map(
             ([key, pack]) => {
-              const configured = Boolean(process.env[pack.priceEnv])
+              const configured = Boolean(runtimeEnv(pack.priceEnv))
               const highlight = key === "pro"
               return (
                 <Card key={key} className={highlight ? "border-gradient relative p-6" : "p-6"}>

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { stripe, isStripeConfigured } from "@/lib/stripe"
 import { CREDIT_PACKS, type CreditPackKey } from "@/lib/credits"
+import { runtimeEnv } from "@/lib/env"
 
 // Creates a Stripe Checkout session (one-time payment) for a credit pack.
 // The pack — and therefore the credited amount — is resolved server-side;
@@ -24,7 +25,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unknown pack. Use starter | pro | scale." }, { status: 400 })
   }
 
-  const priceId = process.env[pack.priceEnv]
+  const priceId = runtimeEnv(pack.priceEnv)
   if (!priceId) {
     return NextResponse.json(
       { error: `Pack not configured: set ${pack.priceEnv} to a Stripe Price ID.` },
