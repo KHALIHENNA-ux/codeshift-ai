@@ -14,7 +14,9 @@ async function main() {
       email: "demo@codeshift.dev",
       name: "Demo User",
       passwordHash,
-      credits: 3,
+      creditTransactions: {
+        create: { amount: 3, type: "SIGNUP_BONUS" },
+      },
     },
   })
   console.log("✓ Seeded demo user — demo@codeshift.dev / demo1234")

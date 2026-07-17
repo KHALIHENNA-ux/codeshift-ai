@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
+import { SIGNUP_BONUS_CREDITS } from "@/lib/credits"
 
 const Body = z.object({
   name: z.string().min(1).max(80),
@@ -22,8 +23,16 @@ export async function POST(req: Request) {
   }
 
   const passwordHash = await bcrypt.hash(password, 12)
+  // The signup bonus rides in the same create — impossible to grant twice.
   await prisma.user.create({
-    data: { name, email, passwordHash, credits: 1 },
+    data: {
+      name,
+      email,
+      passwordHash,
+      creditTransactions: {
+        create: { amount: SIGNUP_BONUS_CREDITS, type: "SIGNUP_BONUS" },
+      },
+    },
   })
 
   return NextResponse.json({ ok: true })

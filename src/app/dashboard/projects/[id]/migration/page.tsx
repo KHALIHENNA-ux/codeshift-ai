@@ -63,6 +63,8 @@ export default function MigrationPage() {
   const [batch, setBatch] = useState<{ index: number; total: number } | null>(null)
   const [done, setDone] = useState(false)
   const [error, setError] = useState("")
+  const [refunded, setRefunded] = useState(0)
+  const [insufficient, setInsufficient] = useState<{ cost: number; balance: number } | null>(null)
   const started = useRef(false)
   const liveRef = useRef<HTMLPreElement>(null)
 
@@ -82,6 +84,11 @@ export default function MigrationPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pathId, designStyle: design }),
       })
+      if (res.status === 402) {
+        const j = (await res.json().catch(() => null)) as { cost?: number; balance?: number } | null
+        setInsufficient({ cost: j?.cost ?? 0, balance: j?.balance ?? 0 })
+        return
+      }
       if (!res.ok || !res.body) {
         setError(await res.text().catch(() => "Migration failed to start."))
         return
@@ -186,6 +193,9 @@ export default function MigrationPage() {
       case "error":
         setError(event.message)
         break
+      case "credits_refunded":
+        setRefunded(event.amount)
+        break
     }
   }
 
@@ -269,10 +279,33 @@ export default function MigrationPage() {
         </CardContent>
       </Card>
 
+      {insufficient && (
+        <Card className="border-amber-500/30">
+          <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4 text-sm">
+            <span className="flex items-center gap-2 text-amber-400">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              Not enough credits — this migration costs {insufficient.cost} credit
+              {insufficient.cost === 1 ? "" : "s"} and you have {insufficient.balance}.
+            </span>
+            <Button asChild variant="gradient" size="sm">
+              <Link href="/credits">Get credits</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {error && (
         <Card className="border-red-500/30">
-          <CardContent className="flex items-center gap-2 py-4 text-sm text-red-400">
-            <AlertCircle className="h-4 w-4" /> {error}
+          <CardContent className="space-y-1 py-4 text-sm">
+            <p className="flex items-center gap-2 text-red-400">
+              <AlertCircle className="h-4 w-4" /> {error}
+            </p>
+            {refunded > 0 && (
+              <p className="text-emerald-400">
+                Your {refunded} credit{refunded === 1 ? "" : "s"} for this run{" "}
+                {refunded === 1 ? "has" : "have"} been refunded.
+              </p>
+            )}
           </CardContent>
         </Card>
       )}

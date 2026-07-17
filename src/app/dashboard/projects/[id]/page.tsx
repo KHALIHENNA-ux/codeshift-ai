@@ -10,6 +10,7 @@ import { MigrationLauncher } from "@/components/dashboard/migration-launcher"
 import { AnalyzeTrigger } from "@/components/dashboard/analyze-trigger"
 import { formatBytes } from "@/lib/utils"
 import { getPath } from "@/lib/migration-paths"
+import { estimateCost, getBalance } from "@/lib/credits"
 import type { DependencyFinding, RiskFinding, DependencyGraph } from "@/types"
 import { FileCode2, Cpu, ShieldCheck, GitCompare, FileText, Target } from "lucide-react"
 
@@ -21,10 +22,8 @@ export default async function ProjectPage({ params }: { params: { id: string } }
   })
   if (!project) notFound()
 
-  const user = await prisma.user.findUnique({
-    where: { id: session!.user.id },
-    select: { credits: true },
-  })
+  const cost = estimateCost(project.totalBytes)
+  const balance = await getBalance(session!.user.id)
 
   const stack = project.detectedStack as { framework?: string; version?: string; language?: string } | null
   const recommended = getPath(project.analysis?.recommendedPath ?? project.sourcePath ?? "")
@@ -132,8 +131,8 @@ export default async function ProjectPage({ params }: { params: { id: string } }
                   <MigrationLauncher
                     projectId={project.id}
                     recommendedPath={project.analysis.recommendedPath ?? "CUSTOM"}
-                    priceCents={project.priceCents}
-                    credits={user?.credits ?? 0}
+                    cost={cost}
+                    balance={balance}
                   />
                 )}
                 {project.status === "MIGRATING" && (

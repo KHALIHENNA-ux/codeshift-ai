@@ -5,6 +5,7 @@ import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
 import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/prisma"
+import { grantSignupBonus } from "@/lib/credits"
 
 const providers: NextAuthConfig["providers"] = [
   Credentials({
@@ -65,6 +66,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
   pages: { signIn: "/login" },
   providers,
+  events: {
+    // OAuth signups (GitHub/Google) don't go through /api/auth/register —
+    // grant the one-time signup bonus here. Idempotent inside.
+    async createUser({ user }) {
+      if (user.id) await grantSignupBonus(user.id)
+    },
+  },
   callbacks: {
     async jwt({ token, account }) {
       // On GitHub sign-in, keep the access token inside the encrypted JWT

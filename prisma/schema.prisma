@@ -20,12 +20,12 @@ model User {
   emailVerified DateTime?
   image         String?
   passwordHash  String?
-  credits       Int       @default(1) // 1 free migration on signup
   createdAt     DateTime  @default(now())
 
-  accounts   Account[]
-  sessions   Session[]
-  projects   Project[]
+  accounts           Account[]
+  sessions           Session[]
+  projects           Project[]
+  creditTransactions CreditTransaction[]
 }
 
 model Account {
@@ -53,6 +53,32 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────── Credits ───────────────────────────
+
+enum CreditTransactionType {
+  PURCHASE
+  CONSUMPTION
+  REFUND
+  SIGNUP_BONUS
+}
+
+// Append-only ledger. A user's balance is SUM(amount) — there is deliberately
+// no denormalized balance column, so the ledger is always the source of truth.
+model CreditTransaction {
+  id                    String                @id @default(cuid())
+  userId                String
+  amount                Int // positive = purchase/refund/bonus, negative = consumption
+  type                  CreditTransactionType
+  migrationId           String? // set for CONSUMPTION and REFUND
+  stripePaymentIntentId String?               @unique // webhook idempotency key for PURCHASE
+  createdAt             DateTime              @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([migrationId])
 }
 
 // ─────────────────────────── Core domain ───────────────────────────

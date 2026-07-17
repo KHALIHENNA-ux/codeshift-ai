@@ -151,6 +151,7 @@ export type EngineEvent =
   | { type: "usage"; tokens: number; cacheReadTokens: number }
   | { type: "done"; message: string }
   | { type: "error"; message: string }
+  | { type: "credits_refunded"; amount: number }
 
 export interface MigrationPathDef {
   id: string

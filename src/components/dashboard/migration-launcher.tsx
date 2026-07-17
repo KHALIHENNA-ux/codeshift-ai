@@ -1,34 +1,31 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { MIGRATION_PATHS, DESIGN_STYLES } from "@/lib/migration-paths"
-import { Wand2 } from "lucide-react"
+import { Wand2, Coins, AlertTriangle } from "lucide-react"
 
 export function MigrationLauncher({
   projectId,
   recommendedPath,
-  priceCents,
-  credits,
+  cost,
+  balance,
 }: {
   projectId: string
   recommendedPath: string
-  priceCents: number
-  credits: number
+  cost: number
+  balance: number
 }) {
   const router = useRouter()
   const [pathId, setPathId] = useState(recommendedPath)
   const [design, setDesign] = useState("keep")
 
-  const dollars = (priceCents / 100).toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  })
+  const sufficient = balance >= cost
 
   function start() {
     const params = new URLSearchParams({ pathId, design })
@@ -87,19 +84,45 @@ export function MigrationLauncher({
         ))}
       </div>
 
-      <div className="flex items-center justify-between border-t border-border pt-5">
-        <div className="text-sm">
-          {credits > 0 ? (
-            <span className="text-emerald-400">First migration free · using 1 credit</span>
-          ) : (
-            <span className="text-muted-foreground">
-              This migration: <span className="font-semibold text-foreground">{dollars}</span>
-            </span>
-          )}
-        </div>
-        <Button variant="gradient" onClick={start}>
-          Start migration
-        </Button>
+      <div className="border-t border-border pt-5">
+        {sufficient ? (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm">
+              <Coins className="h-4 w-4 text-accent" />
+              <span>
+                This migration will cost{" "}
+                <span className="font-semibold text-foreground">
+                  {cost} credit{cost === 1 ? "" : "s"}
+                </span>{" "}
+                <span className="text-muted-foreground">(you have {balance})</span>
+              </span>
+            </div>
+            <Button variant="gradient" onClick={start}>
+              Start migration
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-sm text-amber-400">
+              <AlertTriangle className="h-4 w-4 shrink-0" />
+              <span>
+                Not enough credits — this migration costs{" "}
+                <span className="font-semibold">{cost}</span> and you have{" "}
+                <span className="font-semibold">{balance}</span>.
+              </span>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <Button asChild variant="gradient">
+                <Link href="/credits">
+                  <Coins className="h-4 w-4" /> Get credits
+                </Link>
+              </Button>
+              <Button variant="outline" disabled title="Buy credits first">
+                Start migration
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </Card>
   )
